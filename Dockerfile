@@ -103,4 +103,6 @@ RUN apt-get update && apt-get -y install ffmpeg
 RUN curl https://sh.rustup.rs -sSf -o rustup.sh && chmod +x rustup.sh && ./rustup.sh -y && rm rustup.sh
 RUN apt-get -y install xvfb dbus ttf-freefont udev nodejs npm && dbus-uuidgen > /var/lib/dbus/machine-id
 
+RUN apt-get -y install libgtk2.0-0
+
 ENTRYPOINT ["/home/www-data/run.sh", "su", "-m", "www-data", "-c", "/home/www-data/continue.sh /bin/sh"]
