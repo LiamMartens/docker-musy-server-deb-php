@@ -103,6 +103,10 @@ RUN apt-get update && apt-get -y install ffmpeg
 RUN curl https://sh.rustup.rs -sSf -o rustup.sh && chmod +x rustup.sh && ./rustup.sh -y && rm rustup.sh
 RUN apt-get -y install xvfb dbus ttf-freefont udev nodejs npm && dbus-uuidgen > /var/lib/dbus/machine-id
 
-RUN apt-get -y install libgtk2.0-0
+RUN apt-get -y install libfreetype6 libglib2.0-0 libnss3
+RUN apt-get -y install fontconfig libcairo2 libpangocairo-1.0-0 libx11-xcb1 \
+                        libxcomposite1 libxcursor1 libxrender1 libxdamage1 \
+                        libxi6 libxtst6 libxrandr2 libxss1 libgconf2-4 \
+                        libatk1.0-0 libgtk2.0-0 libpython3.4 libasound2
 
 ENTRYPOINT ["/home/www-data/run.sh", "su", "-m", "www-data", "-c", "/home/www-data/continue.sh /bin/sh"]
