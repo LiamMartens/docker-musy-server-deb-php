@@ -4,7 +4,7 @@ MAINTAINER Liam Martens (hi@liammartens.com)
 ENV DEBIAN_FRONTEND=noninteractive
 
 # add www-data user
-RUN id -u www-data &>/dev/null || adduser --disabled-password www-data
+RUN usermod -p "" --shell /bin/bash www-data
 
 # run updates
 RUN apt-get update && apt-get -y upgrade
