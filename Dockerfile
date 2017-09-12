@@ -115,15 +115,15 @@ WORKDIR /home/www
 RUN curl https://sh.rustup.rs -sSf | sh -s - -y
 
 # create directories
-RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/www && \
-        chown -R $USER:www-data /etc/php/$PHPV /usr/lib/php/$PHPV /var/www
+RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/log/php/$PHPV /var/www && \
+        chown -R $USER:www-data /etc/php/$PHPV /var/log/php/$PHPV /usr/lib/php/$PHPV /var/www
 
 # chown timezone files
 RUN touch /etc/timezone /etc/localtime && \
     chown $USER:www-data /etc/localtime /etc/timezone
 
 # set volumes
-VOLUME ["/etc/php/$PHPV", "/var/www"]
+VOLUME ["/etc/php/$PHPV", "/var/log/php/$PHPV", "/var/www"]
 
 # copy run file
 COPY scripts/run.sh /home/$USER/run.sh
