@@ -1,64 +1,55 @@
-FROM debian:jessie
-MAINTAINER Liam Martens (hi@liammartens.com)
-
+FROM node:8.4.0
+MAINTAINER Liam Martens <hi@liammartens.com>
 ENV DEBIAN_FRONTEND=noninteractive
 
-# add www-data user
-RUN usermod -p "" --shell /bin/bash www-data
+# install pre deps
+RUN apt-get update && apt-get -y upgrade && apt-get -y install debconf apt-transport-https lsb-release ca-certificates
 
-# run updates
-RUN apt-get update && apt-get -y upgrade
+# include debian backports
+RUN echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
+# include dotdeb
+RUN echo 'deb https://packages.sury.org/php jessie main' > /etc/apt/sources.list.d/sury-php.list
+RUN curl -L https://packages.sury.org/php/apt.gpg | apt-key add -
 
-# add default packages
-RUN apt-get -y install tzdata perl curl bash git
+# update for new repos
+RUN apt-get update
+
+# install some dependencies
+RUN apt-get -y install tzdata curl perl bash git nano \
+                        libgtk2.0-0 libgconf-2-4 libasound2 \
+                        libxtst6 libxss1 libnss3 xvfb \
+                        software-properties-common python-software-properties
 
 # install PHP7
-RUN echo "deb http://packages.dotdeb.org jessie all" >> /etc/apt/sources.list
-RUN curl -L https://www.dotdeb.org/dotdeb.gpg | apt-key add -
-ENV PHPV=7.0
-RUN apt-get update && apt-get -y install \
-    openssl \
-    php-pear \
-    php$PHPV-mcrypt \
-    php$PHPV-soap \
-    php$PHPV-gmp \
-    php$PHPV-odbc \
-    php$PHPV-json \
-    php$PHPV-dom \
-    php$PHPV-pdo \
-    php$PHPV-zip \
-    php$PHPV-mysqli \
-    php$PHPV-sqlite3 \
-    php$PHPV-pgsql \
-    php$PHPV-bcmath \
-    php$PHPV-opcache \
-    php$PHPV-intl \
-    php$PHPV-mbstring \
-    php$PHPV-sockets \
-    php$PHPV-xml \
-    php$PHPV-gd \
-    php$PHPV-odbc \
-    php$PHPV-mysql \
-    php$PHPV-sqlite \
-    php$PHPV-gettext \
-    php$PHPV-xmlreader \
-    php$PHPV-xmlrpc \
-    php$PHPV-bz2 \
-    php$PHPV-iconv \
-    php$PHPV-curl \
-    php$PHPV-ctype \
-    php$PHPV-fpm \
-    php$PHPV-common \
-    php$PHPV-phar \
-    php$PHPV-xmlwriter \
-    php$PHPV-tokenizer \
-    php$PHPV-fileinfo \
-    php$PHPV-posix \
-    php$PHPV-imagick
+ENV PHPV=7.1
+RUN apt-get -y install \
+        php$PHPV-common \
+        php$PHPV-mcrypt \
+        php$PHPV-soap \
+        php$PHPV-gmp \
+        php$PHPV-odbc \
+        php$PHPV-mysql \
+        php$PHPV-pgsql \
+        php$PHPV-sqlite3 \
+        php$PHPV-sqlite3 \
+        php$PHPV-json \
+        php$PHPV-xml \
+        php$PHPV-zip \
+        php$PHPV-bcmath \
+        php$PHPV-opcache \
+        php$PHPV-intl \
+        php$PHPV-mbstring \
+        php$PHPV-gd \
+        php$PHPV-xmlrpc \
+        php$PHPV-bz2 \
+        php$PHPV-curl \
+        php$PHPV-phar \
+        php$PHPV-fpm \
+        php$PHPV-imagick \
+        php-yaml
 
-# install yaml 2.0.0 extension
-RUN apt-get -y install php$PHPV-dev autoconf libyaml-0-2 libyaml-dev build-essential git
-RUN pecl install yaml-2.0.0
+# install development packages
+RUN apt-get -y install php$PHPV-dev autoconf make gcc libpcre3-dev g++ build-essential
 
 # install php-redis extension
 RUN git clone https://github.com/phpredis/phpredis
@@ -68,45 +59,78 @@ RUN rm -rf phpredis
 # install phalcon
 RUN git clone --single-branch git://github.com/phalcon/cphalcon
 RUN cd cphalcon/build && ./install
-RUN  rm -rf cphalcon
+RUN rm -rf cphalcon
 
-RUN apt-get -y remove php$PHPV-dev autoconf libyaml-dev build-essential
+# build fffmpeg
+RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
+                        libjpeg-dev libpng12-0 libpng12-dev libtiff5 libtiff5-dev \
+                        libwebp-dev libwebp5 libopenjpeg-dev libopenjpeg5 \
+                        libass-dev libsdl2-dev libtheora-dev libtool libva-dev \
+                        libvdpau-dev libvorbis-dev libxcb-util0-dev texinfo \
+                        wget yasm nasm libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
+                        libopus-dev libvpx-dev
+
+RUN mkdir /ffmpeg && cd /ffmpeg && \
+    wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 && tar xjvf ffmpeg-snapshot.tar.bz2 && \
+    cd ffmpeg && \
+    ./configure --prefix=/usr \
+                --enable-avresample \
+                --enable-avfilter \
+                --enable-gpl \
+                --enable-libmp3lame \
+                --enable-librtmp \
+                --enable-libvorbis \
+                --enable-libvpx \
+                --enable-libx264 \
+                --enable-libx265 \
+                --enable-libtheora \
+                --enable-postproc \
+                --enable-pic \
+                --enable-pthreads \
+                --enable-shared \
+                --disable-stripping \
+                --disable-static \
+                --enable-vaapi \
+                --enable-libopus \
+                --enable-libfreetype \
+                --enable-libfontconfig \
+                --disable-debug && \
+    make && make install && cd / && rm -rf /ffmpeg
+
+# remove build packages
+RUN apt-get -y remove php$PHPV-dev autoconf automake make gcc libpcre3-dev g++ build-essential
 
 # install composer globally
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php -r "if (hash_file('SHA384', 'composer-setup.php') === '669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
-    php composer-setup.php && \
-    php -r "unlink('composer-setup.php');" && \
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \ 
+    php composer-setup.php && php -r "unlink('composer-setup.php');" && \
     mv composer.phar /usr/local/bin/composer
 
-# create php directory
-RUN mkdir -p /etc/php7 /var/log/php7 /usr/lib/php7 /var/www && \
-    chown -R www-data:www-data /etc/php7 /var/log/php7 /usr/lib/php7 /var/www
+# create additional user
+ENV USER=www
+RUN useradd -md /home/$USER -p "" -s /bin/bash $USER && \
+        usermod -aG www-data $USER
+ENV HOME=/home/www
+WORKDIR /home/www
+# install rust
+RUN curl https://sh.rustup.rs -sSf | sh -s - -y
+
+# create directories
+RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/www && \
+        chown -R $USER:www-data /etc/php/$PHPV /usr/lib/php/$PHPV /var/www
 
 # chown timezone files
 RUN touch /etc/timezone /etc/localtime && \
-    chown www-data:www-data /etc/localtime /etc/timezone
+    chown $USER:www-data /etc/localtime /etc/timezone
 
 # set volumes
-VOLUME ["/etc/php7", "/var/log/php7", "/var/www"]
+VOLUME ["/etc/php/$PHPV", "/var/www"]
 
 # copy run file
-COPY scripts/run.sh /home/www-data/run.sh
-RUN chmod +x /home/www-data/run.sh
-COPY scripts/continue.sh /home/www-data/continue.sh
-RUN chmod +x /home/www-data/continue.sh
+COPY scripts/run.sh /home/$USER/run.sh
+RUN chmod +x /home/$USER/run.sh
 
-# PHP BUILD DONE -> CONTINUE WITH MUSY SERVER BUILD
-RUN echo "deb http://http.debian.net/debian jessie-backports main contrib non-free" >> /etc/apt/sources.list
-RUN apt-get update && apt-get -y install ffmpeg
+# dbus and x11
+RUN dbus-uuidgen > /var/lib/dbus/machine-id
+RUN mkdir /tmp/.X11-unix && chown -R root:root /tmp/.X11-unix && chmod -R 1777 /tmp/.X11-unix
 
-RUN curl https://sh.rustup.rs -sSf -o rustup.sh && chmod +x rustup.sh && ./rustup.sh -y && rm rustup.sh
-RUN apt-get -y install xvfb dbus ttf-freefont udev nodejs npm && dbus-uuidgen > /var/lib/dbus/machine-id
-
-RUN apt-get -y install libfreetype6 libglib2.0-0 libnss3
-RUN apt-get -y install fontconfig libcairo2 libpangocairo-1.0-0 libx11-xcb1 \
-                        libxcomposite1 libxcursor1 libxrender1 libxdamage1 \
-                        libxi6 libxtst6 libxrandr2 libxss1 libgconf2-4 \
-                        libatk1.0-0 libgtk2.0-0 libpython3.4 libasound2
-
-ENTRYPOINT ["/home/www-data/run.sh", "su", "-m", "www-data", "-c", "/home/www-data/continue.sh /bin/sh"]
+ENTRYPOINT ["/home/www/run.sh"];
