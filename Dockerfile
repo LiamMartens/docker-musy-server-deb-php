@@ -113,6 +113,7 @@ ENV HOME=/home/www
 WORKDIR /home/www
 # install rust
 RUN curl https://sh.rustup.rs -sSf | sh -s - -y
+RUN chown -R $USER:$USER /home/$USER/.cargo
 
 # create directories
 RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/log/php/$PHPV /var/www && \
