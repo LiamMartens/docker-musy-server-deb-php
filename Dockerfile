@@ -68,7 +68,7 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
                         libass-dev libsdl2-dev libtheora-dev libtool libva-dev \
                         libvdpau-dev libvorbis-dev libxcb-util0-dev texinfo \
                         wget yasm nasm libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
-                        libopus-dev libvpx-dev
+                        libopus-dev libvpx-dev pulseaudio pulseaudio-utils pavucontrol
 
 RUN mkdir /ffmpeg && cd /ffmpeg && \
     wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 && tar xjvf ffmpeg-snapshot.tar.bz2 && \
