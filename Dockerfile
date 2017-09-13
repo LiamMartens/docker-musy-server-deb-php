@@ -98,7 +98,8 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
     make && make install && cd / && rm -rf /ffmpeg
 
 # remove build packages
-RUN apt-get -y remove php$PHPV-dev autoconf automake make gcc libpcre3-dev g++ build-essential
+# keep gcc, g++, build-essential for cargo compiling on docker
+RUN apt-get -y remove php$PHPV-dev libpcre3-dev
 
 # install composer globally
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \ 
