@@ -94,6 +94,7 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
                 --enable-libopus \
                 --enable-libfreetype \
                 --enable-libfontconfig \
+                --enable-libpulse \
                 --disable-debug && \
     make && make install && cd / && rm -rf /ffmpeg
 
@@ -109,12 +110,16 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 # create additional user
 ENV USER=www
 RUN useradd -md /home/$USER -p "" -s /bin/bash $USER && \
-        usermod -aG www-data $USER
+        usermod -aG www-data $USER && \
+        usermod -aG audio $USER
 ENV HOME=/home/www
 WORKDIR /home/www
 # install rust
 RUN curl https://sh.rustup.rs -sSf | sh -s - -y
 RUN chown -R $USER:$USER /home/$USER/.cargo
+
+# more install
+RUN apt-get -y install libpulse0 alsa-utils
 
 # create directories
 RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/log/php/$PHPV /var/www && \
