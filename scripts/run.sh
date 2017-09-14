@@ -66,6 +66,14 @@ checkPhpPool
 perl -p -i.bak -e "s/;*date.timezone\s*=.*/date.timezone = $TIMEZONE/gi" /etc/php/7.1/php.ini
 checkPhpIni
 
+# alsa
+cat <<EOF > ~/.asoundrc
+pcm.!default {
+    type plug slave.pcm "hw:Loopback,0,0"
+}
+EOF
+chown www:www ~/.asoundrc
+
 echo "Starting PHP FPM on $PHP_PORT"
 /etc/init.d/php7.1-fpm start
 
