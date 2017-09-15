@@ -1,5 +1,6 @@
 #!/bin/bash
-chown -R www:www-data /var/www /etc/php/7.1
+chgrp -R www-data /var/www /etc/php/7.1
+chmod -R 755 /var/www /etc/php/7.1 && chmod -R g+w /var/www /etc/php/7.1 && chmod -R g+s /var/www /etc/php/7.1
 
 export HOME=/home/www
 
