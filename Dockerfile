@@ -136,6 +136,10 @@ VOLUME ["/etc/php/$PHPV", "/var/log/php/$PHPV", "/var/www"]
 COPY scripts/run.sh /home/$USER/run.sh
 RUN chmod +x /home/$USER/run.sh
 
+# copy own file
+COPY scripts/own.sh /home/$USER/own.sh
+RUN chmod +x /home/$USER/own.sh
+
 # dbus and x11
 RUN dbus-uuidgen > /var/lib/dbus/machine-id
 RUN mkdir /tmp/.X11-unix && chown -R root:root /tmp/.X11-unix && chmod -R 1777 /tmp/.X11-unix
