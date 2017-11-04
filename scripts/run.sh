@@ -84,7 +84,5 @@ chown www:www ~/.asoundrc
 echo "Starting PHP FPM on $PHP_PORT"
 /etc/init.d/php7.1-fpm start
 
-# run musy startup scripts
-run-parts --regex=musy_.* /etc/init.d
-
-su - -m www
+# switch user and run musy startup scripts
+su - -m www -c 'run-parts --regex=musy_.* /etc/init.d && bash'
