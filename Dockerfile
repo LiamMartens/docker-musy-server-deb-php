@@ -1,4 +1,4 @@
-FROM node:8.4.0
+FROM node:9.1-stretch
 LABEL maintainer="hi@liammartens.com"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -6,9 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get -y upgrade && apt-get -y install debconf apt-transport-https lsb-release ca-certificates
 
 # include debian backports
-RUN echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
+RUN echo 'deb http://deb.debian.org/debian stretch-backports main' > /etc/apt/sources.list.d/backports.list
 # include dotdeb
-RUN echo 'deb https://packages.sury.org/php jessie main' > /etc/apt/sources.list.d/sury-php.list
+RUN echo 'deb https://packages.sury.org/php stretch main' > /etc/apt/sources.list.d/sury-php.list
 RUN curl -L https://packages.sury.org/php/apt.gpg | apt-key add -
 
 # update for new repos
@@ -18,43 +18,15 @@ RUN apt-get update
 RUN apt-get -y install tzdata curl perl bash git nano \
                         libgtk2.0-0 libgconf-2-4 libasound2 \
                         libxtst6 libxss1 libnss3 xvfb \
-                        software-properties-common python-software-properties
-
-# install PHP7
-ENV PHPV=7.1
-RUN apt-get -y install \
-        php$PHPV-common \
-        php$PHPV-mcrypt \
-        php$PHPV-soap \
-        php$PHPV-gmp \
-        php$PHPV-odbc \
-        php$PHPV-mysql \
-        php$PHPV-pgsql \
-        php$PHPV-sqlite3 \
-        php$PHPV-sqlite3 \
-        php$PHPV-json \
-        php$PHPV-xml \
-        php$PHPV-zip \
-        php$PHPV-bcmath \
-        php$PHPV-opcache \
-        php$PHPV-intl \
-        php$PHPV-mbstring \
-        php$PHPV-gd \
-        php$PHPV-xmlrpc \
-        php$PHPV-bz2 \
-        php$PHPV-curl \
-        php$PHPV-phar \
-        php$PHPV-fpm \
-        php$PHPV-imagick \
-        php-yaml
+                        software-properties-common
 
 # install development packages
 RUN apt-get -y install php$PHPV-dev autoconf make gcc libpcre3-dev g++ build-essential
 
 # build fffmpeg
 RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
-                        libjpeg-dev libpng12-0 libpng12-dev libtiff5 libtiff5-dev \
-                        libwebp-dev libwebp5 libopenjpeg-dev libopenjpeg5 \
+                        libjpeg-dev libpng16-16 libpng-dev libtiff5 libtiff5-dev \
+                        libwebp-dev libwebp6 libjpeg62-turbo-dev  libjpeg62-turbo \
                         libass-dev libsdl2-dev libtheora-dev libtool libva-dev \
                         libvdpau-dev libvorbis-dev libxcb-util0-dev texinfo \
                         wget yasm nasm libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
@@ -87,6 +59,34 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
                 --enable-libpulse \
                 --disable-debug && \
     make && make install && cd / && rm -rf /ffmpeg
+
+# install PHP7
+ENV PHPV=7.1
+RUN apt-get -y install \
+        php$PHPV-common \
+        php$PHPV-mcrypt \
+        php$PHPV-soap \
+        php$PHPV-gmp \
+        php$PHPV-odbc \
+        php$PHPV-mysql \
+        php$PHPV-pgsql \
+        php$PHPV-sqlite3 \
+        php$PHPV-sqlite3 \
+        php$PHPV-json \
+        php$PHPV-xml \
+        php$PHPV-zip \
+        php$PHPV-bcmath \
+        php$PHPV-opcache \
+        php$PHPV-intl \
+        php$PHPV-mbstring \
+        php$PHPV-gd \
+        php$PHPV-xmlrpc \
+        php$PHPV-bz2 \
+        php$PHPV-curl \
+        php$PHPV-phar \
+        php$PHPV-fpm \
+        php$PHPV-imagick \
+        php-yaml
 
 # install php-redis extension
 RUN git clone https://github.com/phpredis/phpredis
