@@ -94,9 +94,11 @@ RUN cd phpredis && phpize && ./configure && make && make install
 RUN rm -rf phpredis
 
 # install phalcon
-RUN git clone --single-branch git://github.com/phalcon/cphalcon
-RUN cd cphalcon/build && ./install
-RUN rm -rf cphalcon
+# RUN git clone --single-branch git://github.com/phalcon/cphalcon
+# RUN cd cphalcon/build && ./install
+# RUN rm -rf cphalcon
+RUN curl -s "https://packagecloud.io/install/repositories/phalcon/stable/script.deb.sh" | bash
+RUN apt-get install -y php7.1-phalcon
 
 # remove build packages
 # keep gcc, g++, build-essential for cargo compiling on docker
