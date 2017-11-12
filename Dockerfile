@@ -1,5 +1,5 @@
 FROM node:8.4.0
-MAINTAINER Liam Martens <hi@liammartens.com>
+LABEL maintainer="hi@liammartens.com"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install pre deps
@@ -51,16 +51,6 @@ RUN apt-get -y install \
 # install development packages
 RUN apt-get -y install php$PHPV-dev autoconf make gcc libpcre3-dev g++ build-essential
 
-# install php-redis extension
-RUN git clone https://github.com/phpredis/phpredis
-RUN cd phpredis && phpize && ./configure && make && make install
-RUN rm -rf phpredis
-
-# install phalcon
-RUN git clone --single-branch git://github.com/phalcon/cphalcon
-RUN cd cphalcon/build && ./install
-RUN rm -rf cphalcon
-
 # build fffmpeg
 RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
                         libjpeg-dev libpng12-0 libpng12-dev libtiff5 libtiff5-dev \
@@ -97,6 +87,16 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
                 --enable-libpulse \
                 --disable-debug && \
     make && make install && cd / && rm -rf /ffmpeg
+
+# install php-redis extension
+RUN git clone https://github.com/phpredis/phpredis
+RUN cd phpredis && phpize && ./configure && make && make install
+RUN rm -rf phpredis
+
+# install phalcon
+RUN git clone --single-branch git://github.com/phalcon/cphalcon
+RUN cd cphalcon/build && ./install
+RUN rm -rf cphalcon
 
 # remove build packages
 # keep gcc, g++, build-essential for cargo compiling on docker
