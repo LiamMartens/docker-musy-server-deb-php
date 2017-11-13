@@ -17,8 +17,8 @@ fi
 export PHP_TCP=`awk 'END{print $1}' /etc/hosts`
 
 # set timezone
-cat /usr/share/zoneinfo/$TIMEZONE > /etc/localtime
-echo $TIMEZONE > /etc/timezone
+ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/timezone
 
 # function to check php.ini config and bak
 checkPhpIni() {

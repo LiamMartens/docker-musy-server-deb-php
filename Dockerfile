@@ -20,8 +20,8 @@ RUN apt-get -y install tzdata curl perl bash git nano \
                         libxtst6 libxss1 libnss3 xvfb \
                         software-properties-common
 
-# install development packages
-RUN apt-get -y install php$PHPV-dev autoconf make gcc libpcre3-dev g++ build-essential
+# install general development packages
+RUN apt-get -y install autoconf make gcc libpcre3-dev g++ build-essential
 
 # build fffmpeg
 RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
@@ -86,6 +86,7 @@ RUN apt-get -y install \
         php$PHPV-phar \
         php$PHPV-fpm \
         php$PHPV-imagick \
+        php$PHPV-dev \
         php-yaml
 
 # install php-redis extension
@@ -98,7 +99,7 @@ RUN rm -rf phpredis
 # RUN cd cphalcon/build && ./install
 # RUN rm -rf cphalcon
 RUN curl -s "https://packagecloud.io/install/repositories/phalcon/stable/script.deb.sh" | bash
-RUN apt-get install -y php7.1-phalcon
+RUN apt-get install -y php$PHPV-phalcon
 
 # remove build packages
 # keep gcc, g++, build-essential for cargo compiling on docker
@@ -117,7 +118,7 @@ RUN useradd -md /home/$USER -p "" -s /bin/bash $USER && \
 ENV HOME=/home/www
 WORKDIR /home/www
 # install rust
-RUN curl https://sh.rustup.rs -sSf | sh -s - -y
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN chown -R $USER:$USER /home/$USER/.cargo
 
 # more install
