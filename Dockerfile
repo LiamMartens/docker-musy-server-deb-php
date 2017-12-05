@@ -1,6 +1,9 @@
 FROM node:9.1-stretch
 LABEL maintainer="hi@liammartens.com"
+
+# set envs
 ENV DEBIAN_FRONTEND=noninteractive
+ENV FFMPEG=snapshot
 
 # install pre deps
 RUN apt-get update && apt-get -y upgrade && apt-get -y install debconf apt-transport-https lsb-release ca-certificates
@@ -30,11 +33,12 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
                         libass-dev libsdl2-dev libtheora-dev libtool libva-dev \
                         libvdpau-dev libvorbis-dev libxcb-util0-dev texinfo \
                         wget yasm nasm libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
-                        libopus-dev libvpx-dev pulseaudio pulseaudio-utils pavucontrol
+                        libopus-dev libvpx-dev pulseaudio pulseaudio-utils pavucontrol libavutil55 \
+                        libxv1 libsdl2-2.0-0 libxcb-shape0
 
 RUN mkdir /ffmpeg && cd /ffmpeg && \
-    wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 && tar xjvf ffmpeg-snapshot.tar.bz2 && \
-    cd ffmpeg && \
+    wget http://ffmpeg.org/releases/ffmpeg-${FFMPEG}.tar.bz2 && tar xjvf ffmpeg-${FFMPEG}.tar.bz2 && \
+    cd ffmpeg-${FFMPEG} && \
     ./configure --prefix=/usr \
                 --enable-avresample \
                 --enable-avfilter \
@@ -58,7 +62,7 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
                 --enable-libfontconfig \
                 --enable-libpulse \
                 --disable-debug && \
-    make && make install && cd / && rm -rf /ffmpeg
+    make && make install && cd / && rm -rf /ffmpeg-${FFMPEG} ffmpeg-${FFMPEG}.tar.bz2
 
 # install PHP7
 ENV PHPV=7.1
@@ -123,6 +127,7 @@ RUN chown -R $USER:$USER /home/$USER/.cargo
 
 # more install
 RUN apt-get -y install libpulse0 alsa-utils
+RUN apt-get -y autoremove
 
 # create directories
 RUN mkdir -p /etc/php/$PHPV /usr/lib/php/$PHPV /var/log/php/$PHPV /var/www && \
