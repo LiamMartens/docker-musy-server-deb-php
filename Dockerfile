@@ -38,7 +38,7 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
 
 RUN mkdir /ffmpeg && cd /ffmpeg && \
     wget http://ffmpeg.org/releases/ffmpeg-${FFMPEG}.tar.bz2 && tar xjvf ffmpeg-${FFMPEG}.tar.bz2 && \
-    cd ffmpeg-${FFMPEG} && \
+    cd ffmpeg && \
     ./configure --prefix=/usr \
                 --enable-avresample \
                 --enable-avfilter \
@@ -62,7 +62,7 @@ RUN mkdir /ffmpeg && cd /ffmpeg && \
                 --enable-libfontconfig \
                 --enable-libpulse \
                 --disable-debug && \
-    make && make install && cd / && rm -rf /ffmpeg-${FFMPEG} ffmpeg-${FFMPEG}.tar.bz2
+    make && make install && cd / && rm -rf /ffmpeg ffmpeg-${FFMPEG}.tar.bz2
 
 # install PHP7
 ENV PHPV=7.1
