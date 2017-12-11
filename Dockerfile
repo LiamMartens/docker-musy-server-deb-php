@@ -4,6 +4,7 @@ LABEL maintainer="hi@liammartens.com"
 # set envs
 ENV DEBIAN_FRONTEND=noninteractive
 ENV FFMPEG=snapshot
+ENV LIBAV=12.2
 
 # install pre deps
 RUN apt-get update && apt-get -y upgrade && apt-get -y install debconf apt-transport-https lsb-release ca-certificates
@@ -24,7 +25,13 @@ RUN apt-get -y install tzdata curl perl bash git nano \
                         software-properties-common
 
 # install general development packages
-RUN apt-get -y install autoconf make gcc libpcre3-dev g++ build-essential
+RUN apt-get -y install autoconf make gcc libpcre3-dev g++ build-essential yasm nasm
+
+# build libav from source
+RUN curl -L "https://libav.org/releases/libav-${LIBAV}.tar.xz" -o libav.tar.xz && \
+    tar -xJf libav.tar.xz && rm libav.tar.xz
+RUN cd libav-${LIBAV} && perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 65536/" libavdevice/alsa.h && \
+    ./configure && make && make install && cd ../ && rm -rf libav-${LIBAV}
 
 # build fffmpeg
 RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
@@ -32,7 +39,7 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
                         libwebp-dev libwebp6 libjpeg62-turbo-dev  libjpeg62-turbo \
                         libass-dev libsdl2-dev libtheora-dev libtool libva-dev \
                         libvdpau-dev libvorbis-dev libxcb-util0-dev texinfo \
-                        wget yasm nasm libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
+                        wget libx264-dev libx265-dev libmp3lame-dev librtmp-dev \
                         libopus-dev libvpx-dev pulseaudio pulseaudio-utils pavucontrol libavutil55 \
                         libxv1 libsdl2-2.0-0 libxcb-shape0
 
