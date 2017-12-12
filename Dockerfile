@@ -159,6 +159,5 @@ RUN chmod +x /home/$USER/own.sh
 # dbus, x11 and own
 ONBUILD RUN dbus-uuidgen > /var/lib/dbus/machine-id
 ONBUILD RUN mkdir /tmp/.X11-unix && chown -R root:root /tmp/.X11-unix && chmod -R 1777 /tmp/.X11-unix
-ONBUILD RUN /home/$USER/own.sh
 
 ENTRYPOINT ["/home/www/run.sh"];
