@@ -71,11 +71,8 @@ checkPhpIni
 # alsa
 cat <<EOF > ~/.asoundrc
 pcm.!default {
-    type plug
-    slave {
-        pcm "hw:Loopback,0,0"
-        rate 48000
-    }
+    type hw
+    card 0
 }
 EOF
 chown www:www ~/.asoundrc

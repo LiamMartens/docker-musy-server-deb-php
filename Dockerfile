@@ -30,7 +30,7 @@ RUN apt-get -y install autoconf make gcc libpcre3-dev g++ build-essential yasm n
 # build libav from source
 RUN curl -L "https://libav.org/releases/libav-${LIBAV}.tar.xz" -o libav.tar.xz && \
     tar -xJf libav.tar.xz && rm libav.tar.xz
-RUN cd libav-${LIBAV} && perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 65536/" libavdevice/alsa.h && \
+RUN cd libav-${LIBAV} && perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 262144/" libavdevice/alsa.h && \
     ./configure && make && make install && cd ../ && rm -rf libav-${LIBAV}
 
 # build fffmpeg
@@ -46,6 +46,7 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
 RUN mkdir /ffmpeg && cd /ffmpeg && \
     wget http://ffmpeg.org/releases/ffmpeg-${FFMPEG}.tar.bz2 && tar xjvf ffmpeg-${FFMPEG}.tar.bz2 && \
     cd ffmpeg && \
+    perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 262144/" libavdevice/alsa.h && \
     ./configure --prefix=/usr \
                 --enable-avresample \
                 --enable-avfilter \
