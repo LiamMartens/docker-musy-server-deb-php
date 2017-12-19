@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # own files
-/home/www/own.sh >/dev/null 2>&1 &
-
-export HOME=/home/www
+$HOME/own.sh >/dev/null 2>&1 &
 
 if [ -z "$PHP_PORT" ]; then
     export PHP_PORT=9000
@@ -76,6 +74,9 @@ pcm.!default {
 }
 EOF
 chown www:www ~/.asoundrc
+
+# pulseaudio
+su - -m www -c 'pulseaudio --start'
 
 # start PHP FPM and take ownership
 echo "Starting PHP FPM on $PHP_PORT"
