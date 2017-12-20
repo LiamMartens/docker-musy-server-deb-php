@@ -127,7 +127,11 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 # create additional user
 ENV USER=www
 ENV HOME=/home/www
-RUN useradd -md $HOME -p "" -s /bin/bash $USER && \
+
+# remove node user
+RUN userdel node
+RUN groupadd --gid 1000 www
+RUN useradd --uid 1000 --gid www -md $HOME -p "" -s /bin/bash $USER && \
         usermod -aG www-data $USER && \
         usermod -aG audio,pulse,pulse-access $USER
 WORKDIR /home/www
