@@ -68,15 +68,33 @@ checkPhpIni
 
 # alsa
 cat <<EOF > ~/.asoundrc
-pcm.!default {
+pcm.output {
     type hw
     card 0
 }
+
+ctl.input {
+    type hw
+    card 0
+}
+
+pcm.!default {
+    type plug
+    slave {
+        pcm output
+        rate 44100
+    }
+}
+
+ctl.!default {
+    type plug
+    slave {
+        pcm input
+        rate 44100
+    }
+}
 EOF
 chown www:www ~/.asoundrc
-
-# pulseaudio
-su - -m www -c 'pulseaudio --start'
 
 # start PHP FPM and take ownership
 echo "Starting PHP FPM on $PHP_PORT"
