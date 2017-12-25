@@ -29,13 +29,7 @@ RUN apt-get -y install tzdata curl perl bash git nano \
 # install general development packages
 RUN apt-get -y install autoconf make gcc libpcre3-dev g++ build-essential yasm nasm
 
-# build libav from source
-RUN curl -L "https://libav.org/releases/libav-${LIBAV}.tar.xz" -o libav.tar.xz && \
-    tar -xJf libav.tar.xz && rm libav.tar.xz
-RUN cd libav-${LIBAV} && perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 262144/" libavdevice/alsa.h && \
-    ./configure && make && make install && cd ../ && rm -rf libav-${LIBAV}
-
-# build fffmpeg
+# build avconv and install ffmpeg
 RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms2-dev zlib1g zlib1g-dev \
                         libjpeg-dev libpng16-16 libpng-dev libtiff5 libtiff5-dev \
                         libwebp-dev libwebp6 libjpeg62-turbo-dev  libjpeg62-turbo \
@@ -45,34 +39,9 @@ RUN apt-get -y install automake libfreetype6 libfreetype6-dev liblcms2-2 liblcms
                         libopus-dev libvpx-dev pulseaudio pulseaudio-utils pavucontrol libavutil55 \
                         libxv1 libsdl2-2.0-0 libxcb-shape0
 
-RUN mkdir /ffmpeg && cd /ffmpeg && \
-    wget http://ffmpeg.org/releases/ffmpeg-${FFMPEG}.tar.bz2 && tar xjvf ffmpeg-${FFMPEG}.tar.bz2 && \
-    cd ffmpeg && \
-    perl -i -pe "s/ALSA_BUFFER_SIZE_MAX\s+\d+/ALSA_BUFFER_SIZE_MAX 262144/" libavdevice/alsa.h && \
-    ./configure --prefix=/usr \
-                --enable-avresample \
-                --enable-avfilter \
-                --enable-gpl \
-                --enable-libmp3lame \
-                --enable-librtmp \
-                --enable-libvorbis \
-                --enable-libvpx \
-                --enable-libx264 \
-                --enable-libx265 \
-                --enable-libtheora \
-                --enable-postproc \
-                --enable-pic \
-                --enable-pthreads \
-                --enable-shared \
-                --disable-stripping \
-                --disable-static \
-                --enable-vaapi \
-                --enable-libopus \
-                --enable-libfreetype \
-                --enable-libfontconfig \
-                --enable-libpulse \
-                --disable-debug && \
-    make && make install && cd / && rm -rf /ffmpeg ffmpeg-${FFMPEG}.tar.bz2
+RUN git clone git://git.libav.org/libav.git && cd libav && ./configure && make && make install
+
+RUN apt-get install -y ffmpeg
 
 # install PHP7
 ENV PHPV=7.1
