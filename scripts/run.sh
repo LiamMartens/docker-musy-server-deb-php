@@ -68,30 +68,44 @@ checkPhpIni
 
 # alsa
 cat <<EOF > ~/.asoundrc
-pcm.output {
+pcm.hw_output {
     type hw
     card 0
+    device 0
 }
 
-ctl.input {
+pcm.hw_input {
     type hw
     card 0
+    device 1
+}
+
+pcm.output {
+    type plug
+    slave {
+        pcm hw_output
+        format s16_LE
+        channels 2
+        rate 44100
+    }
+}
+
+pcm.input {
+    type plug
+    slave {
+        pcm hw_input
+        format s16_LE
+        channels 2
+        rate 44100
+    }
 }
 
 pcm.!default {
-    type plug
-    slave {
-        pcm output
-        rate 44100
-    }
+    type pulse
 }
 
 ctl.!default {
-    type plug
-    slave {
-        pcm input
-        rate 44100
-    }
+    type pulse
 }
 EOF
 chown www:www ~/.asoundrc
